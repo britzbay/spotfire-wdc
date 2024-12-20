@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotfire WDC - OpenWeatherMap</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Spotfire Web Data Connector</h1>
+    <form id="weather-form">
+        <label for="city">Enter City:</label>
+        <input type="text" id="city" name="city" required>
+        <button type="submit">Fetch Weather Data</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $("#weather-form").submit(async function(e) {
+                e.preventDefault();
+                const city = $("#city").val();
+                const apiKey = "5094d5181453a32b69d8e5640a461c68"; // Replace with your OpenWeatherMap API key
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.cod !== 200) {
+                        alert(`Error: ${data.message}`);
+                        return;
+                    }
+
+                    // Format data for Spotfire
+                    const formattedData = {
+                        city: data.name,
+                        temperature: (data.main.temp - 273.15).toFixed(2), // Convert from Kelvin to Celsius
+                        weather: data.weather[0].description,
+                        wind_speed: data.wind.speed,
+                    };
+
+                    console.log(formattedData);
+                    // This is where you would send the data to Spotfire (e.g., via JSON response).
+                    alert("Data fetched successfully! Check the console for details.");
+                } catch (error) {
+                    console.error("Error fetching weather data:", error);
+                    alert("Failed to fetch data. Check the console for details.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
